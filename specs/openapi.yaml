@@ -1,0 +1,121 @@
+openapi: "3.0.0"
+info:
+  title: "Symetra Financial"
+  description: "Leverage OKTA to protect Symetra Product APIs"
+  version: "1.0.0"
+
+paths:
+  /health:
+    get:
+      summary: "Health Check"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        '500':
+          description: "Internal Server Error"
+
+  /token:
+    post:
+      summary: "Get Authentication Token"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRequest"
+      responses:
+        '201':
+          description: "Token Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        '500':
+          description: "Internal Server Error"
+
+  /products:
+    get:
+      summary: "Get Products"
+      parameters:
+        - in: header
+          name: Authorization
+          description: "Bearer token to authorize the request."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductsResponse"
+        '500':
+          description: "Internal Server Error"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: "Status of the application."
+
+    TokenRequest:
+      type: object
+      properties:
+        authorization:
+          type: string
+          description: "Authorization header."
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: "Access token."
+
+    Subcategory:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the subcategory."
+
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the product."
+        subcategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subcategory"
+          description: "List of subcategories associated with the product."
+
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the category."
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+          description: "List of products associated with the category."
+
+    ProductsResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+          description: "List of categories containing products."
